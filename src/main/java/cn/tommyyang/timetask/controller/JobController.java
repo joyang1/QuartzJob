@@ -29,9 +29,9 @@ public class JobController extends BaseController{
         String trigger2 = "trigger2";
         String trigger3 = "trigger3";
         String triggerGroup = "triggerGroup";
-        String cron1 = "0 20/2 15 * * ?";
-        String cron2 = "0 20/1 15 * * ?";
-        String cron3 = "0 20/3 15 * * ?";
+        String cron1 = "0 17/1 16 * * ?";
+        String cron2 = "0 17/2 16 * * ?";
+        String cron3 = "0 17/3 16 * * ?";
         QuartzManager.addjob(job1, jobGroup, trigger1, triggerGroup, Job1Impl.class,cron1);
         QuartzManager.addjob(job2, jobGroup, trigger2, triggerGroup, Job2Impl.class,cron2);
         QuartzManager.addjob(job3, jobGroup, trigger3, triggerGroup, Job3Impl.class,cron3);
