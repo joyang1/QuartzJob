@@ -1,9 +1,12 @@
 package cn.tommyyang.timetask.Utils;
 
+import cn.tommyyang.timetask.service.jobs.Job4Impl;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Date;
 
 /**
  * Created by TommyYang on 2018/2/1.
@@ -49,8 +52,37 @@ public class QuartzManager {
                 scheduler.start();
             }
         } catch (SchedulerException e) {
-            logger.error("error:\n",e);
+            logger.error("addjob error:\n",e);
         }
+    }
+
+    /**
+     * @param jobName 任务名
+     * @param jobGroupName 任务组名
+     * @param object 参数
+     * @param time job运行时间
+     *
+     */
+
+    public static void startJobImmediately(String jobName, String jobGroupName, Object object, Date time){
+        try {
+            Scheduler scheduler = schedulerFactory.getScheduler();
+            JobDetail jobDetail = JobBuilder
+                    .newJob(Job4Impl.class)
+                    .withIdentity(jobName, jobGroupName).build();
+            jobDetail.getJobDataMap().put("list", object);
+            SimpleTrigger simpleTrigger = (SimpleTrigger) TriggerBuilder.newTrigger()
+                    .withIdentity(jobName, jobGroupName).startAt(time).build();
+            scheduler.scheduleJob(jobDetail, simpleTrigger);
+            if(!scheduler.isShutdown()){
+                scheduler.start();
+            }
+        } catch (SchedulerException e) {
+            logger.error("startJobImmediately error:\n",e);
+        }
+
+
+
     }
 
     /**
@@ -77,7 +109,7 @@ public class QuartzManager {
                 scheduler.rescheduleJob(triggerKey, trigger);
             }
         } catch (SchedulerException e) {
-            logger.error("error:\n",e);
+            logger.error("modifyJobTime error:\n",e);
         }
     }
 
@@ -96,7 +128,7 @@ public class QuartzManager {
             scheduler.unscheduleJob(triggerKey);// 移除触发器
             scheduler.deleteJob(JobKey.jobKey(jobName,jobGroupName));// 删除任务
         } catch (SchedulerException e) {
-            logger.error("error:\n",e);
+            logger.error("removeJob error:\n",e);
         }
     }
 
@@ -105,7 +137,7 @@ public class QuartzManager {
             Scheduler scheduler = schedulerFactory.getScheduler();
             scheduler.start();
         } catch (SchedulerException e) {
-            logger.error("error:\n",e);
+            logger.error("startJobs error:\n",e);
         }
     }
 
@@ -114,7 +146,7 @@ public class QuartzManager {
             Scheduler scheduler = schedulerFactory.getScheduler();
             scheduler.shutdown();
         } catch (SchedulerException e) {
-            logger.error("error:\n",e);
+            logger.error("shutdownJobs error:\n",e);
         }
     }
 

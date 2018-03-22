@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by TommyYang on 2018/2/1.
@@ -53,6 +56,20 @@ public class JobController extends BaseController{
     @ResponseBody
     public String shutdownJobs(){
         QuartzManager.shutdownJobs();
+        return "success";
+    }
+
+    @RequestMapping("/runjobimme.do")
+    @ResponseBody
+    public String runjobImmediately(){
+        String job = "job4";
+        String jobGroup = "jobGroup";
+        List<String> strList = new ArrayList<>();
+        for (int i = 0; i < 10; i++){
+            strList.add("aaaa"+i);
+        }
+        QuartzManager.startJobImmediately(job, jobGroup, strList, new Date(System.currentTimeMillis()));
+        System.out.println("success");
         return "success";
     }
 
