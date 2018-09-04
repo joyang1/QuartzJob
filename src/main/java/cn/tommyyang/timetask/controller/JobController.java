@@ -1,11 +1,14 @@
 package cn.tommyyang.timetask.controller;
 
 import cn.tommyyang.timetask.Utils.QuartzManager;
+import cn.tommyyang.timetask.model.Job;
 import cn.tommyyang.timetask.service.jobs.Job1Impl;
 import cn.tommyyang.timetask.service.jobs.Job2Impl;
 import cn.tommyyang.timetask.service.jobs.Job3Impl;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,57 +22,58 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("job")
-public class JobController extends BaseController{
+public class JobController extends BaseController {
 
-    @RequestMapping("/runjobs.do")
+    @RequestMapping(value = "/addjob.do", method = RequestMethod.GET)
     @ResponseBody
-    public String runJob(HttpServletRequest request, HttpServletResponse response){
-        String job1 = "job1";
-        String job2 = "job2";
-        String job3 = "job3";
+    public String addJob(HttpServletRequest request, HttpServletResponse response,
+                         @RequestParam(value = "name") String name,
+                         @RequestParam(value = "cron") String cron) {
+        String job = name;
         String jobGroup = "jobGroup";
-        String trigger1 = "trigger1";
-        String trigger2 = "trigger2";
-        String trigger3 = "trigger3";
+        String trigger = "trigger" + job;
         String triggerGroup = "triggerGroup";
-        String cron1 = "0 17/1 16 * * ?";
-        String cron2 = "0 17/2 16 * * ?";
-        String cron3 = "0 17/3 16 * * ?";
-        QuartzManager.addjob(job1, jobGroup, trigger1, triggerGroup, Job1Impl.class,cron1);
-        QuartzManager.addjob(job2, jobGroup, trigger2, triggerGroup, Job2Impl.class,cron2);
-        QuartzManager.addjob(job3, jobGroup, trigger3, triggerGroup, Job3Impl.class,cron3);
-        return "success";
+        Class clazz = Job.getClassByName(name);
+        QuartzManager.addjob(job, jobGroup, trigger, triggerGroup, clazz, cron);
+        return job + " add success";
     }
 
-    @RequestMapping("/deljobs.do")
+    @RequestMapping(value = "modifyjob.do", method = RequestMethod.GET)
     @ResponseBody
-    public String delJob(){
-        String job3 = "job3";
-        String jobGroup = "jobGroup";
-        String trigger3 = "trigger3";
+    public String modifyJob(@RequestParam(value = "name") String name,
+                            @RequestParam(value = "cron") String cron){
+        String job = name;
+        String trigger = "trigger" + job;
         String triggerGroup = "triggerGroup";
-        QuartzManager.removeJob(job3, jobGroup, trigger3, triggerGroup);
-        return "success";
+        QuartzManager.modifyJobTime(trigger, triggerGroup, cron);
+        return String.format("modify job:%s success", job);
+    }
+
+    @RequestMapping("/deljob.do")
+    @ResponseBody
+    public String delJob(@RequestParam(value = "name")String name) {
+        String job = name;
+        String jobGroup = "jobGroup";
+        String trigger = "trigger"+job;
+        String triggerGroup = "triggerGroup";
+        QuartzManager.removeJob(job, jobGroup, trigger, triggerGroup);
+        return job + " delete success";
     }
 
     @RequestMapping("/shutdownjobs.do")
     @ResponseBody
-    public String shutdownJobs(){
+    public String shutdownJobs() {
         QuartzManager.shutdownJobs();
-        return "success";
+        return "shutdown jobs success";
     }
 
     @RequestMapping("/runjobimme.do")
     @ResponseBody
-    public String runjobImmediately(){
-        String job = "job4";
+    public String runjobImmediately(@RequestParam(value = "name")String name) {
+        String job = name;
         String jobGroup = "jobGroup";
-        List<String> strList = new ArrayList<>();
-        for (int i = 0; i < 10; i++){
-            strList.add("aaaa"+i);
-        }
-        QuartzManager.startJobImmediately(job, jobGroup, strList, new Date(System.currentTimeMillis()));
-        System.out.println("success");
+        String data = "testData";
+        QuartzManager.startJobImmediately(job, jobGroup, data, new Date(System.currentTimeMillis()));
         return "success";
     }
 

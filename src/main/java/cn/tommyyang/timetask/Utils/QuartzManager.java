@@ -70,7 +70,7 @@ public class QuartzManager {
             JobDetail jobDetail = JobBuilder
                     .newJob(Job4Impl.class)
                     .withIdentity(jobName, jobGroupName).build();
-            jobDetail.getJobDataMap().put("list", object);
+            jobDetail.getJobDataMap().put("data", object);
             SimpleTrigger simpleTrigger = (SimpleTrigger) TriggerBuilder.newTrigger()
                     .withIdentity(jobName, jobGroupName).startAt(time).build();
             scheduler.scheduleJob(jobDetail, simpleTrigger);
